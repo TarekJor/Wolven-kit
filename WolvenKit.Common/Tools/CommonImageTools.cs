@@ -1,19 +1,20 @@
-﻿using ImageMagick;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WolvenKit.Common.DDS;
 using WolvenKit.Common.Model;
-using WolvenKit.Common.Tools.DDS;
-using WolvenKit.Common.Wcc;
-using static WolvenKit.Common.Tools.DDS.TexconvWrapper;
+using static WolvenKit.Common.DDS.TexconvWrapper;
 
 namespace WolvenKit.Common.Tools
 {
     public static class CommonImageTools
     {
+        
+
+
         /// <summary>
         /// Gets the texture compression method from some weird enum used in xbms
         /// Used when extracting from texture cache

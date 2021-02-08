@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using WolvenKit.Common;
 using WolvenKit.Common.Model;
 
@@ -13,16 +12,16 @@ namespace WolvenKit.Bundles
     {
         public BundleManager()
         {
-            Items = new Dictionary<string, List<IWitcherFile>>();
+            Items = new Dictionary<string, List<IGameFile>>();
             Bundles = new Dictionary<string, Bundle>();
-            FileList = new List<IWitcherFile>();
+            FileList = new List<IGameFile>();
             Extensions = new List<string>();
-            AutocompleteSource = new AutoCompleteStringCollection();
+            AutocompleteSource = new List<string>();
         }
 
         public Dictionary<string, Bundle> Bundles { get; }
         
-        public override EBundleType TypeName => EBundleType.Bundle;
+        public override EArchiveType TypeName => EArchiveType.Bundle;
         public static string SerializationVersion => "1.0";
 
         /// <summary>
@@ -31,7 +30,7 @@ namespace WolvenKit.Bundles
         /// <param name="filename">
         ///     file to process
         /// </param>
-        public override void LoadModBundle(string filename)
+        public override void LoadModArchive(string filename)
         {
             if (Bundles.ContainsKey(filename))
                 return;
@@ -41,7 +40,7 @@ namespace WolvenKit.Bundles
             foreach (var item in bundle.Items)
             {
                 if (!Items.ContainsKey(GetModFolder(filename) + "\\" + item.Key))
-                    Items.Add(GetModFolder(filename) + "\\" + item.Key, new List<IWitcherFile>());
+                    Items.Add(GetModFolder(filename) + "\\" + item.Key, new List<IGameFile>());
 
                 Items[GetModFolder(filename) + "\\" +item.Key].Add(item.Value);
             }
@@ -54,7 +53,7 @@ namespace WolvenKit.Bundles
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="ispatch"></param>
-        public override void LoadBundle(string filename, bool ispatch = false)
+        public override void LoadArchive(string filename, bool ispatch = false)
         {
             if (Bundles.ContainsKey(filename))
                 return;
@@ -64,14 +63,14 @@ namespace WolvenKit.Bundles
             {
                 // add new key if the file isn't already in another bundle
                 if (!Items.ContainsKey(item.Key))
-                    Items.Add(item.Key, new List<IWitcherFile>());
+                    Items.TryAdd(item.Key, new List<IGameFile>());
 
                 // if file is already in another bundle
                 if (ispatch && Items[item.Key].Count > 0)
                 {
                     // check if file is already in contentN directory (content0, content1 etc) 
-                    List<IWitcherFile> filesInBundles = Items[item.Key];
-                    var splits = filesInBundles.First().Bundle.ArchiveAbsolutePath.Split(Path.DirectorySeparatorChar);
+                    List<IGameFile> filesInBundles = Items[item.Key];
+                    var splits = filesInBundles.First().Archive.ArchiveAbsolutePath.Split(Path.DirectorySeparatorChar);
                     var contentdir = splits[splits.Length - 3];
                     if (contentdir.Contains("content"))
                     {
@@ -105,7 +104,7 @@ namespace WolvenKit.Bundles
             contentdirs.Sort(new AlphanumComparator<string>());
             foreach (var file in contentdirs.SelectMany(dir => Directory.GetFiles(dir, "*.bundle", SearchOption.AllDirectories)))
             {
-                LoadBundle(file);
+                LoadArchive(file);
             }
 
             var patchdirs = new List<string>(Directory.GetDirectories(content, "patch*"));
@@ -113,7 +112,7 @@ namespace WolvenKit.Bundles
             foreach (var file in patchdirs.SelectMany(dir =>
                 Directory.GetFiles(dir, "*.bundle", SearchOption.AllDirectories)))
             {
-                LoadBundle(file, true);
+                LoadArchive(file, true);
             }
 
             if (Directory.Exists(dlc))
@@ -126,7 +125,7 @@ namespace WolvenKit.Bundles
                     .SelectMany(dir => Directory.GetFiles(dir ?? "", "*.bundle", SearchOption.AllDirectories)
                     .OrderBy(k => k)))
                 {
-                    LoadBundle(file);
+                    LoadArchive(file);
                 }
             }
 
@@ -139,7 +138,7 @@ namespace WolvenKit.Bundles
         /// </summary>
         /// <param name="mods"></param>
         /// <param name="dlc"></param>
-        public override void LoadModsBundles(string mods, string dlc)
+        public override void LoadModsArchives(string mods, string dlc)
         {
             if (!Directory.Exists(mods))
                 Directory.CreateDirectory(mods);
@@ -148,7 +147,7 @@ namespace WolvenKit.Bundles
             var modbundles = modsdirs.SelectMany(dir => Directory.GetFiles(dir, "*.bundle", SearchOption.AllDirectories)).ToList();
             foreach (var file in modbundles)
             {
-                LoadModBundle(file);
+                LoadModArchive(file);
             }
             
             if (Directory.Exists(dlc))
@@ -159,7 +158,7 @@ namespace WolvenKit.Bundles
                 var tmp = dlcdirs.Where(_ => !VanillaDlClist.Contains(new DirectoryInfo(_).Name)).ToList();
                 foreach (var file in tmp.SelectMany(dir => Directory.GetFiles(dir ?? "", "*.bundle", SearchOption.AllDirectories).OrderBy(k => k)))
                 {
-                    LoadModBundle(file);
+                    LoadModArchive(file);
                 }
             }
             RebuildRootNode();

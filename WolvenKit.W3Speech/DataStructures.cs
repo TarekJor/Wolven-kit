@@ -12,7 +12,7 @@ namespace WolvenKit.W3Speech
     /// <summary>
     /// Describes the items found within the w3speech format.
     /// </summary>
-    public class SpeechEntry : IWitcherFile
+    public class SpeechEntry : IGameFile
     {
         /// <summary>
         /// ID as found in the w3speech format.
@@ -45,9 +45,9 @@ namespace WolvenKit.W3Speech
 
         }
 
-        public SpeechEntry(IWitcherArchive bundle, LanguageSpecificID id, UInt32 id_high, UInt32 wem_offs, UInt32 wem_size, UInt32 cr2w_offs, UInt32 cr2w_size, Single duration)
+        public SpeechEntry(IGameArchive bundle, LanguageSpecificID id, UInt32 id_high, UInt32 wem_offs, UInt32 wem_size, UInt32 cr2w_offs, UInt32 cr2w_size, Single duration)
         {
-            this.Bundle = bundle;
+            this.Archive = bundle;
             this.id = id;
             this.id_high = id_high;
             this.wem_offs = wem_offs;
@@ -61,7 +61,7 @@ namespace WolvenKit.W3Speech
             this.PageOffset = cr2w_offs;
         }
 
-        public IWitcherArchive Bundle { get; set; }
+        public IGameArchive Archive { get; set; }
         public string Name { get; set; }
         public uint Size { get; set; }
         public uint ZSize { get; set; }
@@ -72,25 +72,13 @@ namespace WolvenKit.W3Speech
 
         public void Extract(Stream output)
         {
-            using (var file = MemoryMappedFile.CreateFromFile(Bundle.ArchiveAbsolutePath, FileMode.Open))
+            using (var file = MemoryMappedFile.CreateFromFile(Archive.ArchiveAbsolutePath, FileMode.Open))
             {
                 using (var viewstream = file.CreateViewStream(PageOffset, ZSize, MemoryMappedFileAccess.Read))
                 {
                     viewstream.CopyTo(output);
                 }
             }
-        }
-
-        public string Extract(BundleFileExtractArgs e)
-        {
-            PageOffset = cr2w_offs;
-            ZSize = cr2w_size;
-            Extract(new FileStream(Path.ChangeExtension(e.FileName, ".cr2w"), FileMode.Create));
-            PageOffset = wem_offs;
-            ZSize = wem_size;
-            Extract(new FileStream(Path.ChangeExtension(e.FileName, ".wem"), FileMode.Create));
-
-            return Path.ChangeExtension(e.FileName, ".wem");
         }
 
         public override string ToString()
@@ -102,7 +90,7 @@ namespace WolvenKit.W3Speech
     /// <summary>
     /// Describes the w3speech format.
     /// </summary>
-    public class W3Speech : IWitcherArchive
+    public class W3Speech : IGameArchive
     {
         /// <summary>
         /// Usually CPSW.
@@ -140,7 +128,7 @@ namespace WolvenKit.W3Speech
             this.item_infos = item_infos;
         }
 
-        public EBundleType TypeName => EBundleType.Speech;
+        public EArchiveType TypeName => EArchiveType.Speech;
 
         public string ArchiveAbsolutePath { get; set; }
 

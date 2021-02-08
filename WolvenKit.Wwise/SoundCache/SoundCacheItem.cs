@@ -3,11 +3,11 @@ using System.IO.MemoryMappedFiles;
 using WolvenKit.Common;
 using WolvenKit.Common.Model;
 
-namespace WolvenKit.Wwise.SoundCache
+namespace WolvenKit.Wwise
 {
-    public class SoundCacheItem : IWitcherFile
+    public class SoundCacheItem : IGameFile
     {
-        public IWitcherArchive Bundle { get; set; }
+        public IGameArchive Archive { get; set; }
         /// <summary>
         /// Name of the bundled item in the archive.
         /// </summary>
@@ -26,9 +26,9 @@ namespace WolvenKit.Wwise.SoundCache
         public uint Size { get; set; }
         public uint ZSize { get; set; }
 
-        public SoundCacheItem(IWitcherArchive Parent)
+        public SoundCacheItem(IGameArchive Parent)
         {
-            this.Bundle = Parent;
+            this.Archive = Parent;
         }
 
         public string CompressionType => "None";
@@ -42,22 +42,6 @@ namespace WolvenKit.Wwise.SoundCache
                     viewstream.CopyTo(output);
                 }
             }
-        }
-
-        public string Extract(BundleFileExtractArgs e)
-        {
-            // create new directory and delete existing file
-            Directory.CreateDirectory(Path.GetDirectoryName(e.FileName) ?? "");
-            if (File.Exists(e.FileName))
-                File.Delete(e.FileName);
-
-            using (var output = new FileStream(e.FileName, FileMode.Create, FileAccess.Write))
-            {
-                Extract(output);
-                output.Close();
-            }
-
-            return e.FileName;
         }
     }
 }

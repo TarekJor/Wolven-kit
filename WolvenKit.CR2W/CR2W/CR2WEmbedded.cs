@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Linq;
-using WolvenKit.Common.Model;
+using System.Threading.Tasks;
+using WolvenKit.Common;
 
 namespace WolvenKit.CR2W
 {
@@ -92,10 +93,10 @@ namespace WolvenKit.CR2W
             return Handle;
         }
 
-        public CR2WFile GetParsedFile()
+        public async Task<CR2WFile> GetParsedFile()
         {
-            var parsedFile = new CR2WFile(ParentFile.Logger);
-            switch (parsedFile.Read(Data))
+            var parsedFile = new CR2WFile();
+            switch (await parsedFile.ReadAsync(Data))
             {
                 case EFileReadErrorCodes.NoError:
                     break;
@@ -107,8 +108,8 @@ namespace WolvenKit.CR2W
             }
 
 
-            if (parsedFile.chunks != null && parsedFile.chunks.Any())
-                ClassName = parsedFile.chunks.FirstOrDefault()?.REDType;
+            if (parsedFile.Chunks != null && parsedFile.Chunks.Any())
+                ClassName = parsedFile.Chunks.FirstOrDefault()?.REDType;
 
             return parsedFile;
         }

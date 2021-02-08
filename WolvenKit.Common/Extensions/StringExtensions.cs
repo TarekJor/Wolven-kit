@@ -25,12 +25,12 @@ namespace WolvenKit.Common.Extensions
 
         public static string FirstCharToUpper(this string input)
         {
-            switch (input)
+            return input switch
             {
-                case null: throw new ArgumentNullException(nameof(input));
-                case "": throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
-                default: return input.First().ToString().ToUpper() + input.Substring(1);
-            }
+                null => throw new ArgumentNullException(nameof(input)),
+                "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
+                _ => input.First().ToString().ToUpper() + input.Substring(1)
+            };
         }
 
         public static string FirstCharToLower(this string input)
@@ -51,6 +51,18 @@ namespace WolvenKit.Common.Extensions
                .Replace("-", string.Empty)
                .ToLower();
             return encoded;
+        }
+
+        public static uint HashStringKey(this string key)
+        {
+            char[] keyConverted = key.ToCharArray();
+            uint hash = 0;
+            foreach (char c in keyConverted)
+            {
+                hash *= 31;
+                hash += (uint)c;
+            }
+            return hash;
         }
 
         public static string TrimStart(this string target, string trimString)
@@ -95,13 +107,12 @@ namespace WolvenKit.Common.Extensions
                 projectfolder = EProjectFolders.Uncooked;
             }
 
-            else if (relativePath.StartsWith(EBundleType.SoundCache.ToString()))
-                relativePath = relativePath.Substring(EBundleType.SoundCache.ToString().Length + 1);
-            else if (relativePath.StartsWith(EBundleType.Speech.ToString()))
-                relativePath = relativePath.Substring(EBundleType.Speech.ToString().Length + 1);
+            else if (relativePath.StartsWith(EArchiveType.SoundCache.ToString()))
+                relativePath = relativePath.Substring(EArchiveType.SoundCache.ToString().Length + 1);
+            else if (relativePath.StartsWith(EArchiveType.Speech.ToString()))
+                relativePath = relativePath.Substring(EArchiveType.Speech.ToString().Length + 1);
 
             return (relativePath, isDLC, projectfolder);
         }
-
     }
 }

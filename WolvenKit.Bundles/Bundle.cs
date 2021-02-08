@@ -4,13 +4,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using WolvenKit.Common;
 using WolvenKit.Common.Model;
 
 namespace WolvenKit.Bundles
 {
-    public class Bundle : IWitcherArchive
+    public class Bundle : IGameArchive
     {
         private static readonly byte[] IDString =
         {
@@ -27,7 +26,7 @@ namespace WolvenKit.Bundles
         private uint dataoffset;
         private uint dummysize;
 
-        public List<IWitcherFile> Patchedfiles { get; set; } = new List<IWitcherFile>();
+        public List<IGameFile> Patchedfiles { get; set; } = new List<IGameFile>();
 
         public Bundle(string filename)
         {
@@ -40,7 +39,7 @@ namespace WolvenKit.Bundles
 
         }
 
-        public EBundleType TypeName { get { return EBundleType.Bundle; } }
+        public EArchiveType TypeName { get { return EArchiveType.Bundle; } }
         public string ArchiveAbsolutePath { get; set; }
         public Dictionary<string, BundleItem> Items { get; set; }
         
@@ -57,7 +56,7 @@ namespace WolvenKit.Bundles
 
                 if (!IDString.SequenceEqual(idstring))
                 {
-                    throw new InvalidBundleException("Bundle header mismatch.");
+                    throw new InvalidBundleException("Archive header mismatch.");
                 }
 
                 bundlesize = reader.ReadUInt32();
@@ -70,7 +69,7 @@ namespace WolvenKit.Bundles
                 {
                     var item = new BundleItem
                     {
-                        Bundle = this
+                        Archive = this
                     };
 
                     var strname = Encoding.GetEncoding("ISO-8859-1").GetString(reader.ReadBytes(0x100));
@@ -104,7 +103,7 @@ namespace WolvenKit.Bundles
                     }
                     else
                     {
-                        Console.WriteLine("Warning: Bundle '" + ArchiveAbsolutePath + "' could not be fully loaded as resource '" + item.Name + "' is defined more than once. Thus, only the first definition was loaded.");
+                        Console.WriteLine("Warning: Archive '" + ArchiveAbsolutePath + "' could not be fully loaded as resource '" + item.Name + "' is defined more than once. Thus, only the first definition was loaded.");
                     }
                 }
 
@@ -161,7 +160,7 @@ namespace WolvenKit.Bundles
                     WriteCompressedData(bw, File.ReadAllBytes(item), 5);
                 }
             }
-            MessageBox.Show("Done writing file!");
+            //MessageBox.Show("Done writing file!");
         }
 
         public uint GetSize => this.bundlesize;

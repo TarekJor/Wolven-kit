@@ -44,7 +44,7 @@ namespace WolvenKit.Common.Wcc
         //            return EBundleType.TextureCache.ToString();
         //        case ".re": 
         //        case ".fbx": 
-        //            return EBundleType.Bundle.ToString();
+        //            return EBundleType.Archive.ToString();
         //        default: return "";
         //    }
         //}
@@ -207,7 +207,9 @@ namespace WolvenKit.Common.Wcc
         WorldEmissive,
         WorldNormal,
         WorldNormalHQ,
-        WorldSpecular
+        WorldSpecular,
+        SpeedTreeDiffuseWithAlpha, // not found in ghidra
+        SpeedTreeSpecularWithAlpha
     }
 
     public enum analyzers

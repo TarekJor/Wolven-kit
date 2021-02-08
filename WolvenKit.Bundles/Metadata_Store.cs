@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using WolvenKit.W3Strings;
+using WolvenKit.Common;
 
 namespace WolvenKit.Bundles
 {
@@ -111,7 +110,7 @@ namespace WolvenKit.Bundles
                 fileEntryInfoList = new TDynArray<UFileEntryInfo>();
                 fileEntryInfoList.Deserialize(br);
                 
-                //Read the Bundle Infos
+                //Read the Archive Infos
                 bundleInfoList = new TDynArray<UBundleInfo>();
                 bundleInfoList.Deserialize(br);
 

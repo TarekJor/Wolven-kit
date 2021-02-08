@@ -89,9 +89,9 @@ namespace WolvenKit.Cache
     /// <summary>
     /// Files packed into Collision.cache. Zlib compressed nxb/p3d file.
     /// </summary>
-    public class CollisionCacheItem : IWitcherFile
+    public class CollisionCacheItem : IGameFile
     {
-        public IWitcherArchive Bundle { get; set; }
+        public IGameArchive Archive { get; set; }
         public string Name { get; set; }
         public uint Size { get; set; }
         public uint ZSize { get; set; }
@@ -113,7 +113,7 @@ namespace WolvenKit.Cache
 
         public void Extract(Stream output)
         {
-            using (var file = MemoryMappedFile.CreateFromFile(Bundle.ArchiveAbsolutePath, FileMode.Open))
+            using (var file = MemoryMappedFile.CreateFromFile(Archive.ArchiveAbsolutePath, FileMode.Open))
             using (var viewstream = file.CreateViewStream(PageOffset, ZSize, MemoryMappedFileAccess.Read))
             {
                 var zlib = new ZlibStream(viewstream, CompressionMode.Decompress);
@@ -144,35 +144,6 @@ namespace WolvenKit.Cache
                     zlib.CopyTo(output);
                 }
             }
-        }
-
-        public string Extract(BundleFileExtractArgs e)
-        {
-            var filename = e.FileName;
-            switch (Comtype)
-            {
-                case 1:
-                    filename = Path.ChangeExtension(filename, "bin");
-                    break;
-                case 2:
-                case 5:
-                    filename = Path.ChangeExtension(filename, "nxs"); 
-                    break;
-                case 3: 
-                case 4: 
-                    filename = Path.ChangeExtension(filename, "apb");
-                    break;
-                default:
-                    break;
-            }
-
-            Directory.CreateDirectory(Path.GetDirectoryName(filename) ?? "");
-            using (var output = new FileStream(filename, FileMode.Create, FileAccess.Write))
-            {
-                Extract(output);
-            }
-
-            return filename;
         }
     }
 }

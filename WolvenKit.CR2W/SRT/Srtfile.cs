@@ -1,6 +1,4 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -1102,7 +1100,14 @@ namespace WolvenKit.CR2W.SRT
 
         }
 
-        
+        Task<Common.EFileReadErrorCodes> IWolvenkitFile.Read(BinaryReader file)
+        {
+            throw new NotImplementedException();
+        }
 
+        public void GetChunks()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

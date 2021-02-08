@@ -9,15 +9,13 @@ using System.Xml.Linq;
 using WolvenKit.Common;
 using WolvenKit.Common.Model;
 using WolvenKit.CR2W;
-using WolvenKit.Wwise;
-using WolvenKit.Wwise.SoundCache;
 
-namespace WolvenKit.Cache
+namespace WolvenKit.Wwise
 {
     /// <summary>
     /// The soud archives of Witcher 3. Contains .wem and .bnk sound files.
     /// </summary>
-    public class SoundCache : IWitcherArchive
+    public class SoundCache : IGameArchive
     {
         public const long BIT_LENGTH_32 = 1;
         public const long BIT_LENGTH_64 = 2;
@@ -36,7 +34,7 @@ namespace WolvenKit.Cache
         public long buffsize;
         public long checksum;
 
-        public EBundleType TypeName => EBundleType.SoundCache;
+        public EArchiveType TypeName => EArchiveType.SoundCache;
         public string ArchiveAbsolutePath { get; set; }
 
         public static SoundBanksInfoXML info = new SoundBanksInfoXML(Path.Combine(
@@ -212,7 +210,7 @@ namespace WolvenKit.Cache
         public static string GetIDFromPath(string path)
         {
             var split = path.Split(Path.DirectorySeparatorChar);
-            var actualpath = split.SkipWhile(x => x != EBundleType.SoundCache.ToString()).Skip(1).Aggregate("", (c, n) => c += Path.DirectorySeparatorChar + n).Trim().Trim(Path.DirectorySeparatorChar);
+            var actualpath = split.SkipWhile(x => x != EArchiveType.SoundCache.ToString()).Skip(1).Aggregate("", (c, n) => c += Path.DirectorySeparatorChar + n).Trim().Trim(Path.DirectorySeparatorChar);
             if (actualpath.EndsWith(".wem"))
             {
                 if (info.StreamedFiles.Any(x => x.Path == actualpath))

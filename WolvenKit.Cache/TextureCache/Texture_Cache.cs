@@ -7,24 +7,25 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
 using WolvenKit.Common;
+using WolvenKit.Common.DDS;
+using WolvenKit.Common.Extensions;
 using WolvenKit.Common.FNV1A;
 using WolvenKit.Common.Model;
 using WolvenKit.Common.Services;
 using WolvenKit.Common.Tools;
-using WolvenKit.Common.Tools.DDS;
 using WolvenKit.CR2W;
 using WolvenKit.CR2W.Types;
 
 namespace WolvenKit.Cache
 {
-    public class TextureCache : IWitcherArchive
+    public class TextureCache : IGameArchive
     {
         #region Properties
         // constants
         public static byte[] Magic = { (byte)'H', (byte)'C', (byte)'X', (byte)'T' };
         private const uint MagicInt = 1415070536;
 
-        public EBundleType TypeName => EBundleType.TextureCache;
+        public EArchiveType TypeName => EArchiveType.TextureCache;
 
         public string ArchiveAbsolutePath { get; set; }
 
@@ -278,7 +279,7 @@ namespace WolvenKit.Cache
                                 Name = relativepath,
                                 FullName = filename,
                                 
-                                Hash = HashKey(relativepath),
+                                Hash = relativepath.HashStringKey(),
 
                                 /*------------- TextureCache Data ---------------*/
                                 // NOTE: these need to be populated after writing the files
@@ -756,16 +757,6 @@ namespace WolvenKit.Cache
             }
         }
 
-        private uint HashKey(string key)
-        {
-            char[] keyConverted = key.ToCharArray();
-            uint hash = 0;
-            foreach (char c in keyConverted)
-            {
-                hash *= 31;
-                hash += (uint)c;
-            }
-            return hash;
-        }
+        
     }
 }
